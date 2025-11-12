@@ -208,7 +208,7 @@
                 '서울대학교' 텍스트가 나오는 placeholder 이미지로 교체했습니다.
                 'noto-sans-kr' 폰트를 사용해 한글이 깨지지 않도록 했습니다.
             -->
-            <img src="https://placehold.co/170x40/002878/FFFFFF?text=서울대학교&font=noto-sans-kr" alt="서울대학교 로고">
+            <img src="logo.svg" alt="서울대학교 로고">
             <h1>합격자 통합조회</h1>
         </div>
 
