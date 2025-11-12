@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
     <title>합격자 통합조회</title>
     <style>
         /* 기본 시스템 글꼴 사용 */
@@ -265,6 +266,7 @@
                 <button type="button" onclick="printPage()">합격통지서 출력</button>
                 <button type="button" onclick="goBack()">확인 (로그아웃)</button>
             </div>
+                <button onclick="sendFoolMessage()">카카오톡으로 공유하기</button>
         </div>
 
     </div>
@@ -344,5 +346,18 @@
         }
 
     </script>
+
+
+  <script>
+    // JavaScript 키로 초기화 (너의 앱 키로 바꿔야 함!)
+    Kakao.init("a754e5f463912c53a389aa2e4b1ac411");
+
+    function sendFoolMessage() {
+      Kakao.Link.sendCustom({
+        templateId: 125838 // 너가 만든 템플릿 ID
+      });
+    }
+  </script>
+
 </body>
 </html>
