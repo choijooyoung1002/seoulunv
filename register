@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>합격자 통합조회</title>
+    <style>
+        /* 기본 시스템 글꼴 사용 */
+        body {
+            font-family: 'Malgun Gothic', '맑은 고딕', 'Dotum', '돋움', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 메인 컨테이너 - 고정 폭, 2010년대 스타일 */
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background-color: #ffffff;
+            border: 1px solid #d1d1d1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* 헤더 - SNU 로고와 색상 */
+        .header {
+            background-color: #002878; /* SNU 메인 블루 */
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header img {
+            height: 40px;
+            margin-right: 20px;
+            /* 이미지 로딩 실패 시 배경색과 alt 텍스트가 잘 보이도록 */
+            background-color: #f0f0f0; 
+            color: #333;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* 폼 영역 */
+        .content {
+            padding: 40px;
+        }
+
+        #login-form h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group label {
+            width: 120px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #555;
+            flex-shrink: 0;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        /* 조회하기 버튼 */
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            background-color: #002878;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .submit-btn:hover {
+            background-color: #001f5c;
+        }
+        
+        /* 알림 메시지 (유효성 검사) */
+        #message-box {
+            display: none; /* 평소엔 숨김 */
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #d9534f;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            font-size: 15px;
+        }
+
+        /* --- 합격 결과 페이지 --- */
+        #result-page {
+            padding: 40px;
+            display: none; /* 평소엔 숨김 */
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .result-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #002878;
+            margin: 0;
+        }
+
+        .result-box {
+            border: 1px solid #002878;
+            background-color: #f5f8ff;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .result-box p {
+            font-size: 18px;
+            color: #333;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .result-box .name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #d9534f; /* 합격자 이름 강조 */
+        }
+
+        .info-table {
+            width: 100%;
+            margin: 30px 0;
+            border-top: 2px solid #aaa;
+            border-collapse: collapse;
+        }
+        .info-table th, .info-table td {
+            border-bottom: 1px solid #ddd;
+            padding: 12px;
+            font-size: 15px;
+            text-align: left;
+        }
+        .info-table th {
+            background-color: #f9f9f9;
+            width: 120px;
+            font-weight: 600;
+        }
+
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .button-group button {
+            padding: 10px 20px;
+            font-size: 15px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .button-group button:hover {
+            background-color: #5a6268;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 헤더 -->
+        <div class="header">
+            <!-- 
+                [수정된 부분]
+                SNU CI 이미지가 핫링크 방지 정책으로 차단되었습니다.
+                대신 placehold.co 서비스를 이용해 비슷한 느낌의 파란색 배경에
+                '서울대학교' 텍스트가 나오는 placeholder 이미지로 교체했습니다.
+                'noto-sans-kr' 폰트를 사용해 한글이 깨지지 않도록 했습니다.
+            -->
+            <img src="https://placehold.co/170x40/002878/FFFFFF?text=서울대학교&font=noto-sans-kr" alt="서울대학교 로고">
+            <h1>합격자 통합조회</h1>
+        </div>
+
+        <!-- 로그인 폼 섹션 -->
+        <div class="content" id="login-section">
+            <form id="login-form">
+                <h2>로그인</h2>
+                <div class="form-group">
+                    <label for="name">성명</label>
+                    <input type="text" id="name" placeholder="수험생 성명" required>
+                </div>
+                <div class="form-group">
+                    <label for="dob">생년월일</label>
+                    <input type="text" id="dob" placeholder="생년월일 8자리 (예: 20050101)" required maxlength="8">
+                </div>
+                <button type="submit" class="submit-btn">조회하기</button>
+            </form>
+        </div>
+
+        <!-- 합격 결과 섹션 (숨겨짐) -->
+        <div class="content" id="result-page">
+            <div class="result-header">
+                <h2>합격자 발표</h2>
+            </div>
+
+            <!-- 합격 정보 테이블 -->
+            <table class="info-table">
+                <tbody>
+                    <tr>
+                        <th>수험번호</th>
+                        <td id="fake-exam-id">202612345</td>
+                    </tr>
+                    <tr>
+                        <th>성명</th>
+                        <td id="result-name"></td>
+                    </tr>
+                    <tr>
+                        <th>생년월일</th>
+                        <td id="result-dob"></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- 합격 메시지 박스 -->
+            <div class="result-box">
+                <p>
+                    <span id="result-name-box" class="name"></span> 님은<br>
+                    서울대학교 2026학년도 신입생 모집에<br>
+                    <strong style="font-size: 20px; color: #002878;">최종 합격</strong>하였음을 축하합니다.
+                </p>
+            </div>
+
+            <div class="button-group">
+                <button type="button" onclick="printPage()">합격통지서 출력</button>
+                <button type="button" onclick="goBack()">확인 (로그아웃)</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 알림 메시지용 (유효성 검사) -->
+    <div id="message-box"></div>
+
+    <script>
+        const loginSection = document.getElementById('login-section');
+        const resultSection = document.getElementById('result-page');
+        const loginForm = document.getElementById('login-form');
+        const messageBox = document.getElementById('message-box');
+        let messageTimer;
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const dob = document.getElementById('dob').value.trim();
+
+            // 유효성 검사
+            if (!name || !dob) {
+                showMessage("성명과 생년월일을 모두 입력해주십시오.");
+                return;
+            }
+
+            if (dob.length !== 8 || !/^\d{8}$/.test(dob)) {
+                showMessage("생년월일 8자리를 올바르게 입력해주십시오. (예: 20050101)");
+                return;
+            }
+
+            // 가짜 수험번호 생성 (생년월일 뒤 2자리 + 랜덤 3자리)
+            const fakeId = "2026" + dob.substring(4, 6) + Math.floor(Math.random() * 900 + 100);
+
+            // 결과 페이지에 정보 채우기
+            document.getElementById('fake-exam-id').textContent = fakeId;
+            document.getElementById('result-name').textContent = name;
+            document.getElementById('result-name-box').textContent = name;
+            
+            // 생년월일 포맷팅 (YYYY.MM.DD)
+            const formattedDob = `${dob.substring(0, 4)}.${dob.substring(4, 6)}.${dob.substring(6, 8)}`;
+            document.getElementById('result-dob').textContent = formattedDob;
+
+
+            // 페이지 전환
+            loginSection.style.display = 'none';
+            resultSection.style.display = 'block';
+        });
+
+        // 알림 메시지 표시 함수
+        function showMessage(msg) {
+            clearTimeout(messageTimer);
+            messageBox.textContent = msg;
+            messageBox.style.display = 'block';
+
+            messageTimer = setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 3000);
+        }
+        
+        // '확인 (로그아웃)' 버튼 기능
+        function goBack() {
+            // 실제로는 세션을 만료시키지만, 여기서는 그냥 폼으로 돌아감
+            resultSection.style.display = 'none';
+            loginSection.style.display = 'block';
+            loginForm.reset(); // 폼 초기화
+        }
+
+        // '출력' 버튼 기능 (실제 인쇄 창 띄우기)
+        function printPage() {
+            // alert() 대신 커스텀 메시지를 사용하고 싶지만, 
+            // '찐' 느낌을 위해 브라우저 기본 기능을 사용합니다.
+            // window.print()는 전체 페이지를 인쇄하므로, 
+            // 여기서는 인쇄 기능이 작동한다는 시늉만 합니다.
+            showMessage("인쇄 기능이 연결되었습니다. (재미용)");
+            // window.print(); // 실제 인쇄를 원하면 이 주석을 해제
+        }
+
+    </script>
+</body>
+</html>
